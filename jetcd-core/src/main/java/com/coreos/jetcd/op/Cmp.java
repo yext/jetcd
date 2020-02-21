@@ -26,7 +26,7 @@ import com.google.protobuf.ByteString;
 public class Cmp {
 
   public enum Op {
-    EQUAL, GREATER, LESS
+    EQUAL, GREATER, LESS, NOT_EQUAL
   }
 
   private final ByteString key;
@@ -40,16 +40,19 @@ public class Cmp {
   }
 
   Compare toCompare() {
-    Compare.Builder compareBuiler = Compare.newBuilder().setKey(this.key);
+    Compare.Builder compareBuilder = Compare.newBuilder().setKey(this.key);
     switch (this.op) {
       case EQUAL:
-        compareBuiler.setResult(Compare.CompareResult.EQUAL);
+        compareBuilder.setResult(Compare.CompareResult.EQUAL);
         break;
       case GREATER:
-        compareBuiler.setResult(Compare.CompareResult.GREATER);
+        compareBuilder.setResult(Compare.CompareResult.GREATER);
         break;
       case LESS:
-        compareBuiler.setResult(Compare.CompareResult.LESS);
+        compareBuilder.setResult(Compare.CompareResult.LESS);
+        break;
+      case NOT_EQUAL:
+        compareBuilder.setResult(Compare.CompareResult.NOT_EQUAL);
         break;
       default:
         throw new IllegalArgumentException("Unexpected compare type (" + this.op + ")");
@@ -58,24 +61,24 @@ public class Cmp {
     Compare.CompareTarget target = this.target.getTarget();
     Object value = this.target.getTargetValue();
 
-    compareBuiler.setTarget(target);
+    compareBuilder.setTarget(target);
     switch (target) {
       case VERSION:
-        compareBuiler.setVersion((Long) value);
+        compareBuilder.setVersion((Long) value);
         break;
       case VALUE:
-        compareBuiler.setValue((ByteString) value);
+        compareBuilder.setValue((ByteString) value);
         break;
       case MOD:
-        compareBuiler.setModRevision((Long) value);
+        compareBuilder.setModRevision((Long) value);
         break;
       case CREATE:
-        compareBuiler.setCreateRevision((Long) value);
+        compareBuilder.setCreateRevision((Long) value);
         break;
       default:
         throw new IllegalArgumentException("Unexpected target type (" + target + ")");
     }
 
-    return compareBuiler.build();
+    return compareBuilder.build();
   }
 }
